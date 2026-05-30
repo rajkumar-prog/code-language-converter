@@ -1,7 +1,14 @@
+from __future__ import annotations
+
 from datetime import datetime
-from sqlalchemy import String, DateTime, ForeignKey, Text, func, Integer
+from typing import TYPE_CHECKING
+
+from sqlalchemy import String, DateTime, ForeignKey, Text, func, Integer, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class Project(Base):
@@ -42,6 +49,7 @@ class ProjectFile(Base):
 
 class ConversionHistory(Base):
     __tablename__ = "conversion_history"
+    __table_args__ = (UniqueConstraint("file_id", "version", name="uq_history_file_version"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     file_id: Mapped[int] = mapped_column(ForeignKey("project_files.id"), index=True)

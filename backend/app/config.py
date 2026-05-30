@@ -6,7 +6,7 @@ ENV_FILE = Path(__file__).parent.parent / ".env"
 
 class Settings(BaseSettings):
     anthropic_api_key: str = ""
-    secret_key: str = "changeme_use_32_random_chars_here"
+    secret_key: str  # required — no default; app fails fast if SECRET_KEY is not set
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     database_url: str = "sqlite+aiosqlite:///./language_converter.db"
