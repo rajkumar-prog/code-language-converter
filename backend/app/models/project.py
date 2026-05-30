@@ -15,7 +15,7 @@ class Project(Base):
     __tablename__ = "projects"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
     name: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(Text, default="")
     source_language: Mapped[str] = mapped_column(String(50))
@@ -31,7 +31,7 @@ class ProjectFile(Base):
     __tablename__ = "project_files"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), index=True)
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id", ondelete="CASCADE"), index=True)
     filename: Mapped[str] = mapped_column(String(255))
     filepath: Mapped[str] = mapped_column(String(500))
     source_content: Mapped[str] = mapped_column(Text, default="")
@@ -52,7 +52,7 @@ class ConversionHistory(Base):
     __table_args__ = (UniqueConstraint("file_id", "version", name="uq_history_file_version"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    file_id: Mapped[int] = mapped_column(ForeignKey("project_files.id"), index=True)
+    file_id: Mapped[int] = mapped_column(ForeignKey("project_files.id", ondelete="CASCADE"), index=True)
     version: Mapped[int] = mapped_column(Integer, default=1)
     source_content: Mapped[str] = mapped_column(Text, default="")
     converted_content: Mapped[str] = mapped_column(Text, default="")
