@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.schemas.auth import UserRegister, UserLogin, UserOut, Token
@@ -28,10 +29,12 @@ async def get_current_user(
 
 @router.post("/register", response_model=Token)
 async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
-    existing = await get_user_by_email(db, data.email)
-    if existing:
+    if await get_user_by_email(db, data.email):
         raise HTTPException(status_code=400, detail="Email already registered")
-    user = await create_user(db, data.email, data.name, data.password)
+    try:
+        user = await create_user(db, data.email, data.name.strip(), data.password)
+    except IntegrityError:
+        raise HTTPException(status_code=409, detail="Email already registered")
     token = create_access_token(user.id)
     return Token(access_token=token, token_type="bearer", user=UserOut.model_validate(user))
 
